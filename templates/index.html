@@ -3,218 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Локальный обмен файлами</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>FileChanger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2196F3;
-            --hover-color: #1976D2;
-            --bg-color: #ffffff;
-            --text-color: #333333;
-            --border-color: #e0e0e0;
-            --card-bg: #f5f5f5;
-            --shadow-color: rgba(0, 0, 0, 0.1);
+            --primary-color: #4F46E5;
+            --primary-light: #6366F1;
+            --primary-dark: #4338CA;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --bg-color: #F9FAFB;
+            --text-color: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --card-bg: #FFFFFF;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
         }
 
         [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #ffffff;
-            --border-color: #333333;
-            --card-bg: #2d2d2d;
-            --shadow-color: rgba(0, 0, 0, 0.3);
+            --bg-color: #111827;
+            --text-color: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --border-color: #374151;
+            --card-bg: #1F2937;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 1.5rem;
         }
 
         .header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .username {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .logout-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .logout-button:hover {
+            color: var(--danger-color);
+            background-color: var(--bg-color);
         }
 
         .theme-toggle {
             background: none;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 8px 16px;
-            border-radius: 20px;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
             cursor: pointer;
-            font-weight: 500;
+            font-size: 1.25rem;
         }
 
         .theme-toggle:hover {
-            background-color: var(--primary-color);
-            color: white;
+            color: var(--primary-color);
+            background-color: var(--bg-color);
         }
 
-        .grid {
+        .main-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .card {
             background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px var(--shadow-color);
-        }
-
-        h1, h2 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-
-        .upload-form, .link-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .file-input-wrapper {
-            position: relative;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
             overflow: hidden;
-            display: inline-block;
         }
 
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
             cursor: pointer;
-            width: 100%;
-            height: 100%;
+            transition: all 0.3s;
         }
 
-        .file-input-button {
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary-color);
+            background-color: var(--bg-color);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .button-primary {
             background-color: var(--primary-color);
             color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-            font-weight: 500;
-            text-align: center;
         }
 
-        .file-input-button:hover {
-            background-color: var(--hover-color);
+        .button-primary:hover {
+            background-color: var(--primary-dark);
         }
 
-        input[type="url"], input[type="text"] {
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
+        .button-secondary {
             background-color: var(--bg-color);
             color: var(--text-color);
-            width: 100%;
+            border: 1px solid var(--border-color);
         }
 
-        input[type="url"]:focus, input[type="text"]:focus {
-            outline: none;
+        .button-secondary:hover {
+            background-color: var(--card-bg);
             border-color: var(--primary-color);
         }
 
-        .submit-button {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            width: 100%;
-        }
-
-        .submit-button:hover {
-            background-color: var(--hover-color);
-        }
-
         .file-list {
-            list-style: none;
             display: grid;
-            gap: 10px;
+            gap: 0.75rem;
         }
 
         .file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
             background-color: var(--bg-color);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
         }
 
-        .file-item a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .file-item a:hover {
-            color: var(--hover-color);
-            text-decoration: underline;
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .file-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
 
         .file-icon {
-            font-size: 24px;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 1rem;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .file-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-button:hover {
+            color: var(--primary-color);
+            background-color: var(--bg-color);
+        }
+
+        .connected-devices {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .device-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 0.5rem;
+            gap: 1rem;
+        }
+
+        .device-icon {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-right: 1rem;
+        }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-name {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .device-username {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .device-ip {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-family: monospace;
+        }
+
+        .device-details {
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .device-status {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .connection-info {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .connection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .qr-wrapper {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            width: fit-content;
         }
 
         @media (max-width: 768px) {
-            .grid {
+            .main-grid {
                 grid-template-columns: 1fr;
             }
 
-            .header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
+            .connection-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                padding: 1rem;
             }
         }
 
         .notification {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px var(--shadow-color);
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 1rem 1.5rem;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             transform: translateY(100px);
             opacity: 0;
             transition: transform 0.3s, opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--danger-color);
         }
 
         .notification.show {
@@ -222,264 +390,474 @@
             opacity: 1;
         }
 
-        .connection-info {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .qr-code {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .copy-button {
-            background: white;
-            color: var(--primary-color);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .copy-button:hover {
-            background: var(--hover-color);
-            color: white;
-        }
-
-        .devices-grid {
+        .link-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            gap: 0.75rem;
         }
 
-        .device-card {
-            background: var(--bg-color);
-            border-radius: 8px;
-            padding: 15px;
-            border: 1px solid var(--border-color);
+        .link-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: var(--bg-color);
+            border-radius: 0.5rem;
+            transition: all 0.3s;
         }
 
-        .device-icon {
-            font-size: 24px;
-            margin-right: 10px;
+        .link-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
 
-        .device-info {
-            margin-top: 10px;
-            font-size: 14px;
-            color: var(--text-color);
-            opacity: 0.8;
-        }
-
-        .connection-url {
-            font-family: monospace;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-
-        .refresh-button {
-            background: none;
-            border: 2px solid white;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 500;
-            margin-left: auto;
-        }
-
-        .refresh-button:hover {
-            background: white;
+        .link-icon {
+            font-size: 1.25rem;
             color: var(--primary-color);
+            margin-right: 1rem;
         }
 
-        @media (max-width: 768px) {
-            .connection-info {
-                flex-direction: column;
-                text-align: center;
-            }
+        .link-info {
+            flex: 1;
+            overflow: hidden;
+        }
 
-            .refresh-button {
-                margin: 10px auto 0;
+        .link-url {
+            font-weight: 500;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .link-url:hover {
+            text-decoration: underline;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .link-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 640px) {
+            .link-form {
+                flex-direction: row;
             }
+        }
+
+        .link-form input[type="url"] {
+            flex: 1;
+            min-width: 0;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .link-form input[type="url"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .delete-button {
+            color: var(--danger-color);
+        }
+
+        .delete-button:hover {
+            color: var(--danger-color);
+            background-color: rgba(239, 68, 68, 0.1);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>Локальный обмен файлами</h1>
-            <button class="theme-toggle" onclick="toggleTheme()">Сменить тему</button>
-        </header>
-
-        <div class="connection-info">
-            <div>
-                <h2 style="color: white; margin-bottom: 10px;">Подключение</h2>
-                <span class="connection-url">http://{{ local_ip }}:5000</span>
-                <button class="copy-button" onclick="copyUrl()">
-                    <span>Копировать</span>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-cloud-upload-alt"></i>
+                FileChanger
+            </div>
+            <div class="header-actions">
+                <span class="username">{{ username }}</span>
+                <a href="{{ url_for('logout') }}" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Выйти
+                </a>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
                 </button>
             </div>
-            <div id="qrcode" class="qr-code"></div>
-            <button class="refresh-button" onclick="refreshDevices()">Обновить список устройств</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="connection-info">
+            <div class="connection-grid">
+                <div>
+                    <h2 style="margin-bottom: 0.5rem">Подключение</h2>
+                    <p>IP адрес: {{ local_ip }}:5000</p>
+                </div>
+                <div class="qr-wrapper">
+                    <div id="qrcode"></div>
+                </div>
+                <button class="button button-secondary" onclick="copyToClipboard('http://{{ local_ip }}:5000')">
+                    <i class="fas fa-copy"></i>
+                    Копировать ссылку
+                </button>
+            </div>
         </div>
 
-        <div class="card">
-            <h2>Подключенные устройства</h2>
-            <div class="devices-grid">
-                {% for ip, device in connected_devices.items() %}
-                <div class="device-card">
-                    <span class="device-icon">{{ '📱' if device.device_type == 'Мобильное устройство' else '💻' }}</span>
-                    <span>{{ device.device_type }}</span>
-                    <div class="device-info">
-                        <div>IP: {{ ip }}</div>
-                        <div>Последняя активность: {{ device.last_seen }}</div>
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-upload"></i>
+                        Загрузка файлов
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                        <div class="upload-zone" id="dropZone">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <p class="upload-text">Перетащите файлы сюда или нажмите для выбора</p>
+                            <input type="file" name="file" id="fileInput" style="display: none">
+                            <button type="button" class="button button-primary" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-plus"></i>
+                                Выбрать файл
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-link"></i>
+                        Поделиться ссылкой
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form action="/save_link" method="post" class="link-form" id="linkForm">
+                        <input type="url" name="link" placeholder="Вставьте ссылку" required>
+                        <button type="submit" class="button button-primary">
+                            <i class="fas fa-share"></i>
+                            Поделиться
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-link"></i>
+                        Сохраненные ссылки
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="link-list">
+                        {% if links %}
+                            {% for link in links %}
+                            <div class="link-item">
+                                <i class="fas fa-external-link-alt link-icon"></i>
+                                <div class="link-info">
+                                    <a href="{{ link }}" target="_blank" class="link-url" rel="noopener noreferrer">{{ link }}</a>
+                                </div>
+                                <div class="link-actions">
+                                    <button class="action-button" onclick="copyToClipboard('{{ link }}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    {% if deletable_links[link] %}
+                                    <button class="action-button delete-button" onclick="deleteLink('{{ link }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <p>Нет сохраненных ссылок</p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="grid">
-            <div class="card">
-                <h2>Загрузить файл</h2>
-                <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data" onsubmit="showNotification('Файл загружается...')">
-                    <div class="file-input-wrapper">
-                        <div class="file-input-button">Выберите файл</div>
-                        <input type="file" name="file" id="file-input" onchange="updateFileName(this)">
-                    </div>
-                    <div id="file-name"></div>
-                    <button type="submit" class="submit-button">Загрузить</button>
-                </form>
             </div>
 
             <div class="card">
-                <h2>Сохранить ссылку</h2>
-                <form class="link-form" action="/save_link" method="post" onsubmit="showNotification('Ссылка сохранена')">
-                    <input type="url" name="link" placeholder="Введите ссылку" required>
-                    <button type="submit" class="submit-button">Сохранить</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Доступные файлы</h2>
-            <ul class="file-list">
-                {% for file in files %}
-                <li class="file-item">
-                    <div class="file-info">
-                        <span class="file-icon">📄</span>
-                        <a href="{{ url_for('download_file', filename=file) }}">{{ file }}</a>
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-file-alt"></i>
+                        Файлы
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="file-list">
+                        {% if files %}
+                            {% for file in files %}
+                            <div class="file-item">
+                                <i class="fas fa-file file-icon"></i>
+                                <div class="file-info">
+                                    <a href="{{ url_for('download_file', filename=file) }}" class="file-name">{{ file }}</a>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="action-button" onclick="copyToClipboard('{{ request.url_root }}download/{{ file }}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <a href="{{ url_for('download_file', filename=file) }}" class="action-button">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    {% if deletable_files[file] %}
+                                    <button class="action-button delete-button" onclick="deleteFile('{{ file }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <p>Нет загруженных файлов</p>
+                            </div>
+                        {% endif %}
                     </div>
-                    <span class="file-date">{{ file }}</span>
-                </li>
-                {% endfor %}
-            </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-users"></i>
+                        Подключенные устройства
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="connected-devices" id="connectedDevices">
+                        {% for ip, device in connected_devices.items() %}
+                        <div class="device-item">
+                            <i class="fas {% if device.device_type == 'Мобильное устройство' %}fa-mobile-alt{% else %}fa-laptop{% endif %} device-icon"></i>
+                            <div class="device-info">
+                                <div class="device-name">
+                                    {{ device.device_type }}
+                                    {% if device.username %}
+                                    <span class="device-username">{{ device.username }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if is_owner %}
+                                <div class="device-ip">{{ ip }}</div>
+                                <div class="device-details">
+                                    {{ device.user_agent }}
+                                </div>
+                                {% endif %}
+                                <div class="device-status">Последняя активность: {{ device.last_seen }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            if (currentTheme === 'dark') {
-                body.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
+        // Theme toggling
+        const themeToggle = document.getElementById('themeToggle');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        function setTheme(isDark) {
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+
+        // Initialize theme
+        setTheme(prefersDark.matches);
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            setTheme(!isDark);
+        });
+
+        // File upload handling
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('dragover');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                fileInput.files = files;
+                uploadForm.submit();
             }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                uploadForm.submit();
+            }
+        });
+
+        // QR Code generation
+        new QRCode(document.getElementById("qrcode"), {
+            text: 'http://{{ local_ip }}:5000',
+            width: 128,
+            height: 128
+        });
+
+        // Clipboard functionality
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Скопировано в буфер обмена', 'success');
+            }).catch(() => {
+                showNotification('Не удалось скопировать', 'error');
+            });
         }
 
-        function updateFileName(input) {
-            const fileName = input.files[0]?.name || '';
-            document.getElementById('file-name').textContent = fileName;
-        }
-
-        function showNotification(message) {
+        // Notification system
+        function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
-            notification.textContent = message;
+            const notificationText = document.getElementById('notificationText');
+            
+            notification.className = 'notification ' + type;
+            notificationText.textContent = message;
             notification.classList.add('show');
+
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
         }
 
-        // Восстановление темы при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.setAttribute('data-theme', 'dark');
-            }
-        });
-
-        // Генерация QR-кода
-        document.addEventListener('DOMContentLoaded', () => {
-            const url = 'http://{{ local_ip }}:5000';
-            QRCode.toCanvas(document.getElementById('qrcode'), url, {
-                width: 128,
-                height: 128,
-                margin: 1,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                }
-            });
-        });
-
-        // Копирование URL
-        function copyUrl() {
-            const url = 'http://{{ local_ip }}:5000';
-            navigator.clipboard.writeText(url).then(() => {
-                showNotification('URL скопирован в буфер обмена');
-            });
-        }
-
-        // Обновление списка устройств
-        function refreshDevices() {
+        // Connected devices update
+        function updateConnectedDevices() {
             fetch('/get_connected_devices')
                 .then(response => response.json())
                 .then(devices => {
-                    const grid = document.querySelector('.devices-grid');
-                    grid.innerHTML = '';
+                    const container = document.getElementById('connectedDevices');
+                    container.innerHTML = '';
+                    
                     for (const [ip, device] of Object.entries(devices)) {
-                        const deviceEl = document.createElement('div');
-                        deviceEl.className = 'device-card';
-                        deviceEl.innerHTML = `
-                            <span class="device-icon">${device.device_type === 'Мобильное устройство' ? '📱' : '💻'}</span>
-                            <span>${device.device_type}</span>
-                            <div class="device-info">
-                                <div>IP: ${ip}</div>
-                                <div>Последняя активность: ${device.last_seen}</div>
+                        container.innerHTML += `
+                            <div class="device-item">
+                                <i class="fas ${device.device_type === 'Мобильное устройство' ? 'fa-mobile-alt' : 'fa-laptop'} device-icon"></i>
+                                <div class="device-info">
+                                    <div class="device-name">${device.device_type}</div>
+                                    <div class="device-status">Последняя активность: ${device.last_seen}</div>
+                                </div>
                             </div>
                         `;
-                        grid.appendChild(deviceEl);
                     }
-                    showNotification('Список устройств обновлен');
                 });
         }
 
-        // Автоматическое обновление списка устройств каждые 30 секунд
-        setInterval(refreshDevices, 30000);
+        // Update connected devices every 30 seconds
+        setInterval(updateConnectedDevices, 30000);
+
+        // Link management
+        function deleteLink(link) {
+            if (confirm('Вы уверены, что хотите удалить эту ссылку?')) {
+                fetch('/delete_link', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'link=' + encodeURIComponent(link)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Ссылка удалена', 'success');
+                        location.reload();
+                    } else {
+                        showNotification('Ошибка при удалении ссылки', 'error');
+                    }
+                })
+                .catch(() => {
+                    showNotification('Ошибка при удалении ссылки', 'error');
+                });
+            }
+        }
+
+        // Form submission handling
+        document.getElementById('linkForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('/save_link', {
+                method: 'POST',
+                body: formData
+            })
+            .then(() => {
+                showNotification('Ссылка сохранена', 'success');
+                this.reset();
+                location.reload();
+            })
+            .catch(() => {
+                showNotification('Ошибка при сохранении ссылки', 'error');
+            });
+        });
+
+        // File management
+        function deleteFile(filename) {
+            if (confirm('Вы уверены, что хотите удалить этот файл?')) {
+                fetch(`/delete_file/${filename}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Файл удален', 'success');
+                        location.reload();
+                    } else {
+                        showNotification(data.error || 'Ошибка при удалении файла', 'error');
+                    }
+                })
+                .catch(() => {
+                    showNotification('Ошибка при удалении файла', 'error');
+                });
+            }
+        }
     </script>
 </body>
 </html> 
