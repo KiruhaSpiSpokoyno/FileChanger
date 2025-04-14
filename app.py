@@ -95,6 +95,10 @@ def can_delete_file(filename):
     if 'user_id' not in session:
         return False
     
+    # Владелец системы может удалять любые файлы
+    if is_owner():
+        return True
+    
     owners = load_file_owners()
     if filename not in owners:
         return False
@@ -104,6 +108,10 @@ def can_delete_file(filename):
 def can_delete_link(link):
     if 'user_id' not in session:
         return False
+    
+    # Владелец системы может удалять любые ссылки
+    if is_owner():
+        return True
     
     owners = load_link_owners()
     if link not in owners:
@@ -136,6 +144,55 @@ def track_visitor():
     if 'user_id' not in session and 'username' in session:
         session['user_id'] = str(time.time()) + request.remote_addr
 
+def format_name_with_initials(lastname, firstname, patronymic=None):
+    """Форматирует ФИО в формат: Фамилия И.О."""
+    if not lastname or not firstname:
+        return "Неизвестно"
+    
+    initials = f"{firstname[0]}." if firstname else ""
+    if patronymic and len(patronymic) > 0:
+        initials += f"{patronymic[0]}."
+    return f"{lastname} {initials}"
+
+def get_extended_device_info(ip):
+    """Получает расширенную информацию об устройстве"""
+    try:
+        hostname = socket.gethostbyaddr(ip)[0]
+    except:
+        hostname = "Неизвестно"
+    
+    try:
+        fqdn = socket.getfqdn(ip)
+    except:
+        fqdn = "Неизвестно"
+    
+    return {
+        "hostname": hostname,
+        "fqdn": fqdn,
+        "ip": ip
+    }
+
+@app.route('/get_device_info/<ip>')
+def get_device_info(ip):
+    devices = load_json(DEVICES_PATH, {})
+    if ip in devices:
+        device_info = devices[ip].copy()
+        extended_info = get_extended_device_info(ip)
+        device_info.update(extended_info)
+        
+        # Форматируем имя пользователя
+        if 'username' in device_info:
+            user_data = load_users().get(device_info['username'], {})
+            if user_data:
+                device_info['formatted_name'] = format_name_with_initials(
+                    user_data.get('lastname', ''),
+                    user_data.get('firstname', ''),
+                    user_data.get('patronymic', '')
+                )
+        
+        return jsonify(device_info)
+    return jsonify({'error': 'Устройство не найдено'})
+
 @app.route('/')
 def index():
     if 'username' not in session:
@@ -157,20 +214,84 @@ def index():
     link_owners = load_link_owners()
     devices = load_json(DEVICES_PATH, {})
     file_owners = load_file_owners()
+    users = load_users()
     
-    # Определяем, какие файлы и ссылки может удалить текущий пользователь
-    deletable_files = {file: can_delete_file(file) for file in files}
-    deletable_links = {link: can_delete_link(link) for link in links}
+    # Форматируем информацию о файлах и их владельцах
+    files_info = {}
+    for file in files:
+        owner_info = file_owners.get(file, {})
+        owner_id = owner_info.get('uploader')
+        formatted_name = "Неизвестно"
+        
+        # Ищем пользователя по ID
+        for username, user_data in users.items():
+            if owner_id and owner_id == session.get('user_id'):
+                formatted_name = format_name_with_initials(
+                    user_data.get('lastname', ''),
+                    user_data.get('firstname', ''),
+                    user_data.get('patronymic', '')
+                )
+                break
+        
+        files_info[file] = {
+            'name': file,
+            'uploader': formatted_name,
+            'upload_time': owner_info.get('upload_time', 'Неизвестно'),
+            'can_delete': can_delete_file(file)
+        }
+    
+    # Форматируем информацию о ссылках и их владельцах
+    links_info = {}
+    for link in links:
+        owner_info = link_owners.get(link, {})
+        owner_id = owner_info.get('uploader')
+        formatted_name = "Неизвестно"
+        
+        # Ищем пользователя по ID
+        for username, user_data in users.items():
+            if owner_id and owner_id == session.get('user_id'):
+                formatted_name = format_name_with_initials(
+                    user_data.get('lastname', ''),
+                    user_data.get('firstname', ''),
+                    user_data.get('patronymic', '')
+                )
+                break
+        
+        links_info[link] = {
+            'url': link,
+            'uploader': formatted_name,
+            'upload_time': owner_info.get('upload_time', 'Неизвестно'),
+            'can_delete': can_delete_link(link)
+        }
+    
+    # Форматируем имя текущего пользователя
+    user_data = users.get(username, {})
+    formatted_username = format_name_with_initials(
+        user_data.get('lastname', ''),
+        user_data.get('firstname', ''),
+        user_data.get('patronymic', '')
+    )
+    
+    # Форматируем информацию об устройствах
+    formatted_devices = {}
+    for ip, device in devices.items():
+        device_info = device.copy()
+        if 'username' in device_info:
+            user_data = users.get(device_info['username'], {})
+            device_info['formatted_name'] = format_name_with_initials(
+                user_data.get('lastname', ''),
+                user_data.get('firstname', ''),
+                user_data.get('patronymic', '')
+            )
+        formatted_devices[ip] = device_info
     
     return render_template('index.html',
-                         username=username,
+                         username=formatted_username,
                          is_owner=is_owner,
-                         files=files,
-                         links=links,
-                         deletable_files=deletable_files,
-                         deletable_links=deletable_links,
+                         files=files_info,
+                         links=links_info,
                          local_ip=get_local_ip(),
-                         connected_devices=devices)
+                         connected_devices=formatted_devices)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -223,7 +344,10 @@ def delete_file(filename):
 @app.route('/save_link', methods=['POST'])
 def save_link():
     link = request.form.get('link')
-    if link:
+    if not link:
+        return jsonify({'success': False, 'error': 'Ссылка не указана'})
+    
+    try:
         links = load_links()
         if link not in links:
             links.append(link)
@@ -232,13 +356,16 @@ def save_link():
             # Сохраняем информацию о владельце ссылки
             owners = load_link_owners()
             owners[link] = {
-                'owner': session['user_id'],
-                'uploader': session['user_id'],
+                'owner': session.get('user_id'),
+                'uploader': session.get('user_id'),
                 'upload_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             save_link_owners(owners)
-            
-    return redirect(url_for('index'))
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Эта ссылка уже сохранена'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/delete_link', methods=['POST'])
 def delete_link():

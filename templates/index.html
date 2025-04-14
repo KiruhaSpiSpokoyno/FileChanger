@@ -449,29 +449,68 @@
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
+            margin-bottom: 1rem;
+            background-color: var(--bg-color);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .link-form:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .link-input {
+            flex: 1;
+            min-width: 0;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .link-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .link-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .submit-button {
+            background-color: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .submit-button:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .submit-button i {
+            font-size: 1.1em;
         }
 
         @media (min-width: 640px) {
             .link-form {
                 flex-direction: row;
             }
-        }
-
-        .link-form input[type="url"] {
-            flex: 1;
-            min-width: 0;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-size: 1rem;
-        }
-
-        .link-form input[type="url"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px var(--primary-light);
         }
 
         .delete-button {
@@ -481,6 +520,74 @@
         .delete-button:hover {
             color: var(--danger-color);
             background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .link-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .link-form input[type="url"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        
+        .link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .link-content {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .link-meta {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .link-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .empty-message {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+        
+        .copy-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            animation: fadeOut 2s ease-in-out;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
         }
     </style>
 </head>
@@ -552,49 +659,31 @@
                     </h2>
                 </div>
                 <div class="card-body">
-                    <form action="/save_link" method="post" class="link-form" id="linkForm">
-                        <input type="url" name="link" placeholder="Вставьте ссылку" required>
-                        <button type="submit" class="button button-primary">
-                            <i class="fas fa-share"></i>
-                            Поделиться
+                    <div class="link-form">
+                        <input type="text" id="linkInput" class="link-input" placeholder="Введите ссылку">
+                        <button onclick="saveLink()" class="submit-button">
+                            <i class="fas fa-paper-plane"></i>
+                            Отправить
                         </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-link"></i>
-                        Сохраненные ссылки
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div class="link-list">
-                        {% if links %}
-                            {% for link in links %}
-                            <div class="link-item">
-                                <i class="fas fa-external-link-alt link-icon"></i>
-                                <div class="link-info">
-                                    <a href="{{ link }}" target="_blank" class="link-url" rel="noopener noreferrer">{{ link }}</a>
-                                </div>
-                                <div class="link-actions">
-                                    <button class="action-button" onclick="copyToClipboard('{{ link }}')">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                    {% if deletable_links[link] %}
-                                    <button class="action-button delete-button" onclick="deleteLink('{{ link }}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    {% endif %}
+                    </div>
+                    <div class="file-list">
+                        {% for link in links.values() %}
+                        <div class="file-item">
+                            <i class="fas fa-link file-icon"></i>
+                            <div class="file-info">
+                                <a href="{{ link.url }}" target="_blank" class="file-name">{{ link.url }}</a>
+                                <div class="file-meta">
+                                    <span>{{ link.uploader }}</span> • 
+                                    <span>{{ link.upload_time }}</span>
                                 </div>
                             </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="empty-state">
-                                <p>Нет сохраненных ссылок</p>
-                            </div>
-                        {% endif %}
+                            {% if link.can_delete %}
+                            <button onclick="deleteLink('{{ link.url }}')" class="button button-secondary">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -609,21 +698,24 @@
                 <div class="card-body">
                     <div class="file-list">
                         {% if files %}
-                            {% for file in files %}
+                            {% for file_info in files.values() %}
                             <div class="file-item">
                                 <i class="fas fa-file file-icon"></i>
                                 <div class="file-info">
-                                    <a href="{{ url_for('download_file', filename=file) }}" class="file-name">{{ file }}</a>
+                                    <a href="{{ url_for('download_file', filename=file_info.name) }}" class="file-name">{{ file_info.name }}</a>
+                                    <div class="file-meta">
+                                        Загрузил: {{ file_info.uploader }} | {{ file_info.upload_time }}
+                                    </div>
                                 </div>
                                 <div class="file-actions">
-                                    <button class="action-button" onclick="copyToClipboard('{{ request.url_root }}download/{{ file }}')">
+                                    <button class="action-button" onclick="copyToClipboard('{{ request.url_root }}download/{{ file_info.name }}')">
                                         <i class="fas fa-copy"></i>
                                     </button>
-                                    <a href="{{ url_for('download_file', filename=file) }}" class="action-button">
+                                    <a href="{{ url_for('download_file', filename=file_info.name) }}" class="action-button">
                                         <i class="fas fa-download"></i>
                                     </a>
-                                    {% if deletable_files[file] %}
-                                    <button class="action-button delete-button" onclick="deleteFile('{{ file }}')">
+                                    {% if file_info.can_delete %}
+                                    <button class="action-button delete-button" onclick="deleteFile('{{ file_info.name }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     {% endif %}
@@ -653,18 +745,25 @@
                             <i class="fas {% if device.device_type == 'Мобильное устройство' %}fa-mobile-alt{% else %}fa-laptop{% endif %} device-icon"></i>
                             <div class="device-info">
                                 <div class="device-name">
-                                    {{ device.device_type }}
-                                    {% if device.username %}
-                                    <span class="device-username">{{ device.username }}</span>
+                                    <span class="device-type">{{ device.device_type }}</span>
+                                    {% if device.formatted_name %}
+                                    <span class="device-username">{{ device.formatted_name }}</span>
                                     {% endif %}
                                 </div>
-                                {% if is_owner %}
-                                <div class="device-ip">{{ ip }}</div>
-                                <div class="device-details">
-                                    {{ device.user_agent }}
+                                <div class="device-details" style="display: none;" id="details-{{ ip }}">
+                                    <p><strong>IP:</strong> {{ ip }}</p>
+                                    <p><strong>Устройство:</strong> {{ device.device_type }}</p>
+                                    <p><strong>Последняя активность:</strong> {{ device.last_seen }}</p>
+                                    {% if is_owner %}
+                                    <p><strong>User Agent:</strong> {{ device.user_agent }}</p>
+                                    {% endif %}
                                 </div>
-                                {% endif %}
-                                <div class="device-status">Последняя активность: {{ device.last_seen }}</div>
+                                <div class="device-actions">
+                                    <button class="action-button" onclick="toggleDetails('{{ ip }}')">
+                                        <i class="fas fa-info-circle"></i>
+                                        Подробнее
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
@@ -749,11 +848,18 @@
 
         // Clipboard functionality
         function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showNotification('Скопировано в буфер обмена', 'success');
-            }).catch(() => {
-                showNotification('Не удалось скопировать', 'error');
-            });
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    // Можно добавить уведомление об успешном копировании
+                    const notification = document.createElement('div');
+                    notification.className = 'copy-notification';
+                    notification.textContent = 'Скопировано!';
+                    document.body.appendChild(notification);
+                    setTimeout(() => notification.remove(), 2000);
+                })
+                .catch(err => {
+                    console.error('Ошибка при копировании: ', err);
+                });
         }
 
         // Notification system
@@ -797,46 +903,62 @@
 
         // Link management
         function deleteLink(link) {
-            if (confirm('Вы уверены, что хотите удалить эту ссылку?')) {
-                fetch('/delete_link', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'link=' + encodeURIComponent(link)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification('Ссылка удалена', 'success');
-                        location.reload();
-                    } else {
-                        showNotification('Ошибка при удалении ссылки', 'error');
-                    }
-                })
-                .catch(() => {
-                    showNotification('Ошибка при удалении ссылки', 'error');
-                });
+            if (!confirm('Вы уверены, что хотите удалить эту ссылку?')) {
+                return;
             }
+
+            fetch('/delete_link', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'link=' + encodeURIComponent(link)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error || 'Ошибка при удалении ссылки');
+                }
+            })
+            .catch(error => {
+                alert('Ошибка при удалении ссылки');
+            });
         }
 
         // Form submission handling
-        document.getElementById('linkForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
+        function saveLink() {
+            const linkInput = document.getElementById('linkInput');
+            const link = linkInput.value.trim();
+
+            if (!link) {
+                showNotification('Введите ссылку', 'error');
+                return;
+            }
+
             fetch('/save_link', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'link=' + encodeURIComponent(link)
             })
-            .then(() => {
-                showNotification('Ссылка сохранена', 'success');
-                this.reset();
-                location.reload();
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Ссылка успешно сохранена', 'success');
+                    linkInput.value = '';
+                    location.reload();
+                } else {
+                    showNotification(data.error || 'Ошибка при сохранении ссылки', 'error');
+                }
             })
-            .catch(() => {
+            .catch(error => {
                 showNotification('Ошибка при сохранении ссылки', 'error');
+                console.error('Ошибка:', error);
             });
-        });
+        }
 
         // File management
         function deleteFile(filename) {
@@ -856,6 +978,17 @@
                 .catch(() => {
                     showNotification('Ошибка при удалении файла', 'error');
                 });
+            }
+        }
+
+        function toggleDetails(ip) {
+            const details = document.getElementById(`details-${ip}`);
+            if (details) {
+                if (details.style.display === 'none') {
+                    details.style.display = 'block';
+                } else {
+                    details.style.display = 'none';
+                }
             }
         }
     </script>

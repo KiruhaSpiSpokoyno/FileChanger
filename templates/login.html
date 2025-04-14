@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FileChanger - Вход</title>
+    <title>Вход - FileChanger</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -11,44 +11,80 @@
             --primary-color: #4F46E5;
             --primary-light: #6366F1;
             --primary-dark: #4338CA;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
             --bg-color: #F9FAFB;
             --text-color: #1F2937;
             --text-secondary: #6B7280;
             --border-color: #E5E7EB;
             --card-bg: #FFFFFF;
+            --input-bg: #FFFFFF;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #111827;
+            --text-color: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --border-color: #374151;
+            --card-bg: #1F2937;
+            --input-bg: #374151;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
         body {
             font-family: 'Inter', system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.5;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 1rem;
+            line-height: 1.5;
         }
 
         .login-container {
-            background-color: var(--card-bg);
-            border-radius: 1rem;
-            box-shadow: var(--shadow);
-            padding: 2rem;
             width: 100%;
             max-width: 400px;
-            margin: 1rem;
+            background-color: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
         }
 
         .login-header {
+            padding: 1.5rem;
             text-align: center;
-            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary-color);
+            background-color: var(--bg-color);
         }
 
         .logo {
@@ -59,32 +95,38 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+            padding: 1.5rem;
         }
 
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         .form-group label {
-            font-weight: 500;
+            display: block;
+            margin-bottom: 0.5rem;
             color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .required {
+            color: var(--danger-color);
+            margin-left: 0.25rem;
         }
 
         .form-group input {
+            width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid var(--border-color);
             border-radius: 0.5rem;
+            background-color: var(--input-bg);
+            color: var(--text-color);
             font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: all 0.3s;
         }
 
         .form-group input:focus {
@@ -93,68 +135,183 @@
             box-shadow: 0 0 0 2px var(--primary-light);
         }
 
-        .button {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        .form-group input::placeholder {
+            color: var(--text-secondary);
         }
 
-        .button:hover {
+        .submit-button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-button:hover {
             background-color: var(--primary-dark);
         }
 
+        .submit-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 0;
+            }
+        }
+
         .error-message {
-            color: #EF4444;
+            color: var(--danger-color);
             font-size: 0.875rem;
             margin-top: 0.25rem;
             display: none;
+        }
+
+        .form-group.error input {
+            border-color: var(--danger-color);
+        }
+
+        .form-group.error .error-message {
+            display: block;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-header">
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
             <div class="logo">
                 <i class="fas fa-cloud-upload-alt"></i>
                 FileChanger
             </div>
-            <p style="color: var(--text-secondary)">Введите ваше имя для продолжения</p>
+            <p style="color: var(--text-secondary);">Введите ваши данные для входа</p>
         </div>
-
+        
         <form class="login-form" action="{{ url_for('set_username') }}" method="post" onsubmit="return validateForm()">
             <div class="form-group">
                 <label>Фамилия <span class="required">*</span></label>
-                <input type="text" name="lastname" required>
+                <input type="text" name="lastname" id="lastname" required 
+                       placeholder="Введите фамилию"
+                       pattern="[А-Яа-яЁё\s-]+"
+                       title="Используйте только русские буквы, пробел и дефис">
+                <div class="error-message">Введите корректную фамилию</div>
             </div>
+            
             <div class="form-group">
                 <label>Имя <span class="required">*</span></label>
-                <input type="text" name="firstname" required>
+                <input type="text" name="firstname" id="firstname" required 
+                       placeholder="Введите имя"
+                       pattern="[А-Яа-яЁё\s-]+"
+                       title="Используйте только русские буквы, пробел и дефис">
+                <div class="error-message">Введите корректное имя</div>
             </div>
+            
             <div class="form-group">
                 <label>Отчество</label>
-                <input type="text" name="patronymic">
+                <input type="text" name="patronymic" id="patronymic" 
+                       placeholder="Введите отчество (необязательно)"
+                       pattern="[А-Яа-яЁё\s-]*"
+                       title="Используйте только русские буквы, пробел и дефис">
+                <div class="error-message">Введите корректное отчество</div>
             </div>
-            <button type="submit" class="button">Войти</button>
+            
+            <button type="submit" class="submit-button">
+                <i class="fas fa-sign-in-alt"></i>
+                Войти
+            </button>
         </form>
     </div>
 
     <script>
-        function validateForm() {
-            const username = document.getElementById('username').value.trim();
-            const errorMessage = document.getElementById('error-message');
-            
-            if (!username) {
-                errorMessage.style.display = 'block';
-                return false;
-            }
-            
-            return true;
+        // Theme toggling
+        const themeToggle = document.getElementById('themeToggle');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        function setTheme(isDark) {
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            setTheme(savedTheme === 'dark');
+        } else {
+            setTheme(prefersDark.matches);
+        }
+
+        // Listen for theme toggle clicks
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            setTheme(currentTheme !== 'dark');
+        });
+
+        // Listen for system theme changes
+        prefersDark.addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches);
+            }
+        });
+
+        // Form validation
+        function validateForm() {
+            const lastname = document.getElementById('lastname');
+            const firstname = document.getElementById('firstname');
+            const patronymic = document.getElementById('patronymic');
+            let isValid = true;
+
+            // Validate lastname
+            if (!lastname.value.match(/^[А-Яа-яЁё\s-]+$/)) {
+                lastname.parentElement.classList.add('error');
+                isValid = false;
+            } else {
+                lastname.parentElement.classList.remove('error');
+            }
+
+            // Validate firstname
+            if (!firstname.value.match(/^[А-Яа-яЁё\s-]+$/)) {
+                firstname.parentElement.classList.add('error');
+                isValid = false;
+            } else {
+                firstname.parentElement.classList.remove('error');
+            }
+
+            // Validate patronymic if not empty
+            if (patronymic.value && !patronymic.value.match(/^[А-Яа-яЁё\s-]+$/)) {
+                patronymic.parentElement.classList.add('error');
+                isValid = false;
+            } else {
+                patronymic.parentElement.classList.remove('error');
+            }
+
+            return isValid;
+        }
+
+        // Real-time validation
+        const inputs = document.querySelectorAll('input[pattern]');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.value && !input.value.match(new RegExp(input.pattern))) {
+                    input.parentElement.classList.add('error');
+                } else {
+                    input.parentElement.classList.remove('error');
+                }
+            });
+        });
     </script>
 </body>
 </html> 
