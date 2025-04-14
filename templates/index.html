@@ -589,10 +589,314 @@
             70% { opacity: 1; }
             100% { opacity: 0; }
         }
+
+        /* Стили для боковой панели */
+        .sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-lg);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .close-sidebar:hover {
+            color: var(--danger-color);
+            background-color: var(--bg-color);
+        }
+
+        .sidebar-content {
+            padding: 1.5rem;
+        }
+
+        .settings-group {
+            margin-bottom: 2rem;
+        }
+
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .settings-field {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-field label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .settings-field .field-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .settings-field .input-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+            margin-top: 0.5rem;
+        }
+
+        .settings-field .input-wrapper {
+            flex: 1;
+            position: relative;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .settings-field .input-wrapper:hover {
+            border-color: var(--primary-color);
+        }
+
+        .settings-field .input-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .settings-field input[type="password"],
+        .settings-field input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            padding-right: 2.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            font-size: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .settings-field input[type="password"]:focus,
+        .settings-field input[type="text"]:focus {
+            outline: none;
+        }
+
+        .settings-field input[type="password"]::placeholder,
+        .settings-field input[type="text"]::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .settings-field .toggle-visibility {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 2;
+            background-color: var(--bg-color);
+        }
+
+        .settings-field .toggle-visibility:hover {
+            color: var(--primary-color);
+            background-color: var(--card-bg);
+        }
+
+        .settings-field .toggle-visibility i {
+            font-size: 1.1rem;
+        }
+
+        .settings-field .generate-button {
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+
+        .settings-field .generate-button:hover {
+            background-color: var(--card-bg);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .settings-field .generate-button:active {
+            transform: translateY(0);
+        }
+
+        .settings-field .generate-button i {
+            font-size: 1.1em;
+            transition: transform 0.3s ease;
+        }
+
+        .settings-field .generate-button:hover i {
+            transform: rotate(180deg);
+        }
+
+        .settings-actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Кнопка открытия настроек в хедере */
+        .settings-button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.3s;
+        }
+
+        .settings-button:hover {
+            color: var(--primary-color);
+            background-color: var(--bg-color);
+        }
+
+        /* Затемнение фона при открытой панели */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .settings-field-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .settings-field-group .size-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .settings-field-group input[type="number"] {
+            border: none;
+            border-radius: 0;
+            padding: 0.75rem;
+            width: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .settings-field-group select {
+            padding: 0.75rem;
+            border: none;
+            border-left: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            min-width: 80px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1rem;
+            padding-right: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .settings-field-group select:hover {
+            background-color: var(--card-bg);
+        }
+
+        .settings-field-group input[type="number"]:focus,
+        .settings-field-group select:focus {
+            outline: none;
+            background-color: var(--card-bg);
+        }
+
+        .size-input-wrapper:hover {
+            border-color: var(--primary-color);
+        }
+
+        .size-input-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
     </style>
 </head>
 <body>
-    <header class="header">
+        <header class="header">
         <div class="header-content">
             <div class="logo">
                 <i class="fas fa-cloud-upload-alt"></i>
@@ -600,21 +904,108 @@
             </div>
             <div class="header-actions">
                 <span class="username">{{ username }}</span>
+                {% if is_owner %}
+                <button class="settings-button" onclick="toggleSidebar()">
+                    <i class="fas fa-cog"></i>
+                </button>
+                {% endif %}
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <a href="{{ url_for('logout') }}" class="logout-button">
                     <i class="fas fa-sign-out-alt"></i>
                     Выйти
                 </a>
-                <button class="theme-toggle" id="themeToggle">
-                    <i class="fas fa-moon"></i>
-                </button>
             </div>
         </div>
-    </header>
+        </header>
+
+    <!-- Боковая панель настроек -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Настройки репозитория</h2>
+            <button class="close-sidebar" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-content">
+            <form id="settingsForm" onsubmit="saveSettings(event)">
+                <div class="settings-group">
+                    <h3 class="settings-title">Безопасность</h3>
+                    <div class="settings-field">
+                        <label for="repoPassword">Пароль репозитория</label>
+                        <div class="field-description">
+                            Установите пароль для доступа к репозиторию. Оставьте поле пустым, чтобы отключить защиту паролем.
+                        </div>
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <input type="password" id="repoPassword" placeholder="Введите пароль репозитория" autocomplete="new-password">
+                                <button type="button" class="toggle-visibility" onclick="togglePasswordVisibility('repoPassword', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <button type="button" class="generate-button" onclick="generatePassword('repoPassword')">
+                                <i class="fas fa-dice"></i>
+                                Сгенерировать
+                            </button>
+                        </div>
+                    </div>
+                    <div class="settings-field">
+                        <label for="secretKey">Секретный ключ</label>
+                        <div class="field-description">
+                            Секретный ключ используется для шифрования данных и сессий. Рекомендуется использовать сложный ключ.
+                        </div>
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <input type="password" id="secretKey" placeholder="Введите секретный ключ" autocomplete="new-password">
+                                <button type="button" class="toggle-visibility" onclick="togglePasswordVisibility('secretKey', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <button type="button" class="generate-button" onclick="generateKey('secretKey')">
+                                <i class="fas fa-key"></i>
+                                Сгенерировать
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3 class="settings-title">Ограничения</h3>
+                    <div class="settings-field">
+                        <label for="maxFileSize">Максимальный размер файла</label>
+                        <div class="field-description">
+                            Установите максимально допустимый размер загружаемых файлов. Значение не может превышать 1 ГБ.
+                        </div>
+                        <div class="settings-field-group">
+                            <div class="size-input-wrapper">
+                                <input type="number" id="maxFileSize" min="1" value="16">
+                                <select id="fileSizeUnit">
+                                    <option value="KB">КБ</option>
+                                    <option value="MB" selected>МБ</option>
+                                    <option value="GB">ГБ</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-actions">
+                    <button type="submit" class="button button-primary">
+                        <i class="fas fa-save"></i>
+                        Сохранить
+                    </button>
+                    <button type="button" class="button button-secondary" onclick="toggleSidebar()">
+                        Отмена
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="container">
         <div class="connection-info">
             <div class="connection-grid">
-                <div>
+            <div>
                     <h2 style="margin-bottom: 0.5rem">Подключение</h2>
                     <p>IP адрес: {{ local_ip }}:5000</p>
                 </div>
@@ -629,13 +1020,13 @@
         </div>
 
         <div class="main-grid">
-            <div class="card">
+        <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">
                         <i class="fas fa-upload"></i>
                         Загрузка файлов
                     </h2>
-                </div>
+                    </div>
                 <div class="card-body">
                     <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
                         <div class="upload-zone" id="dropZone">
@@ -646,10 +1037,10 @@
                                 <i class="fas fa-plus"></i>
                                 Выбрать файл
                             </button>
-                        </div>
-                    </form>
                 </div>
+                    </form>
             </div>
+        </div>
 
             <div class="card">
                 <div class="card-header">
@@ -657,7 +1048,7 @@
                         <i class="fas fa-link"></i>
                         Поделиться ссылкой
                     </h2>
-                </div>
+                    </div>
                 <div class="card-body">
                     <div class="link-form">
                         <input type="text" id="linkInput" class="link-input" placeholder="Введите ссылку">
@@ -728,16 +1119,16 @@
                             </div>
                         {% endif %}
                     </div>
-                </div>
             </div>
+        </div>
 
-            <div class="card">
+        <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">
                         <i class="fas fa-users"></i>
                         Подключенные устройства
                     </h2>
-                </div>
+                    </div>
                 <div class="card-body">
                     <div class="connected-devices" id="connectedDevices">
                         {% for ip, device in connected_devices.items() %}
@@ -766,7 +1157,7 @@
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
+                {% endfor %}
                     </div>
                 </div>
             </div>
@@ -989,6 +1380,108 @@
                 } else {
                     details.style.display = 'none';
                 }
+            }
+        }
+
+        // Добавляем новые функции для работы с боковой панелью
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function saveSettings(event) {
+            event.preventDefault();
+            const password = document.getElementById('repoPassword').value;
+            const secretKey = document.getElementById('secretKey').value;
+            const maxFileSize = document.getElementById('maxFileSize').value;
+            const fileSizeUnit = document.getElementById('fileSizeUnit').value;
+
+            // Конвертируем размер в байты
+            let sizeInBytes;
+            switch(fileSizeUnit) {
+                case 'KB':
+                    sizeInBytes = maxFileSize * 1024;
+                    break;
+                case 'MB':
+                    sizeInBytes = maxFileSize * 1024 * 1024;
+                    break;
+                case 'GB':
+                    sizeInBytes = maxFileSize * 1024 * 1024 * 1024;
+                    break;
+                default:
+                    sizeInBytes = maxFileSize * 1024 * 1024; // По умолчанию МБ
+            }
+
+            fetch('/save_settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    password: password,
+                    secret_key: secretKey,
+                    max_file_size: maxFileSize,
+                    file_size_unit: fileSizeUnit
+                })
+            })
+                .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Настройки успешно сохранены', 'success');
+                    toggleSidebar();
+                } else {
+                    showNotification(data.error || 'Ошибка при сохранении настроек', 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Ошибка при сохранении настроек', 'error');
+                console.error('Ошибка:', error);
+            });
+        }
+
+        // Функции для генерации пароля и ключа
+        function generatePassword(inputId) {
+            const length = 12;
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+            let password = "";
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+            document.getElementById(inputId).value = password;
+            document.getElementById(inputId).type = 'text';
+            setTimeout(() => {
+                document.getElementById(inputId).type = 'password';
+            }, 3000);
+            showNotification('Пароль сгенерирован', 'success');
+        }
+
+        function generateKey(inputId) {
+            const length = 32;
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+            let key = "";
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                key += charset[randomIndex];
+            }
+            document.getElementById(inputId).value = key;
+            document.getElementById(inputId).type = 'text';
+            setTimeout(() => {
+                document.getElementById(inputId).type = 'password';
+            }, 3000);
+            showNotification('Ключ сгенерирован', 'success');
+        }
+
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                input.type = 'password';
+                button.innerHTML = '<i class="fas fa-eye"></i>';
             }
         }
     </script>

@@ -33,6 +33,7 @@ LINKS_PATH = os.path.join('Base', 'links.json')
 USERS_PATH = os.path.join('Base', 'users.json')
 OWNER_PATH = os.path.join('Base', 'owner.txt')
 DEVICES_PATH = os.path.join('Base', 'devices.json')
+SETTINGS_PATH = os.path.join('Base', 'settings.json')
 
 def get_owner():
     if os.path.exists(OWNER_PATH):
@@ -467,6 +468,66 @@ def logout():
     session.pop('username', None)
     session.pop('user_id', None)
     return redirect(url_for('login'))
+
+def load_settings():
+    return load_json(SETTINGS_PATH, {
+        'password': None,
+        'secret_key': None,
+        'max_file_size': 16,
+        'file_size_unit': 'MB'
+    })
+
+def save_settings(settings):
+    save_json(SETTINGS_PATH, settings)
+
+@app.route('/save_settings', methods=['POST'])
+def save_repository_settings():
+    if not is_owner():
+        return jsonify({'success': False, 'error': 'Недостаточно прав'})
+    
+    try:
+        data = request.get_json()
+        max_file_size = int(data.get('max_file_size', 16))
+        file_size_unit = data.get('file_size_unit', 'MB')
+
+        # Проверка значений
+        if max_file_size < 1:
+            return jsonify({'success': False, 'error': 'Размер файла должен быть больше 0'})
+
+        # Проверяем максимальные значения для разных единиц
+        max_limits = {
+            'KB': 1024 * 1024,  # 1 ГБ в КБ
+            'MB': 1024,         # 1 ГБ в МБ
+            'GB': 1             # 1 ГБ
+        }
+
+        if max_file_size > max_limits.get(file_size_unit, 16):
+            return jsonify({'success': False, 'error': f'Максимальный размер для {file_size_unit}: {max_limits[file_size_unit]}'})
+
+        # Конвертируем в байты для сохранения
+        size_multipliers = {
+            'KB': 1024,
+            'MB': 1024 * 1024,
+            'GB': 1024 * 1024 * 1024
+        }
+        size_in_bytes = max_file_size * size_multipliers.get(file_size_unit, 1024 * 1024)
+
+        settings = {
+            'password': data.get('password'),
+            'secret_key': data.get('secret_key'),
+            'max_file_size': max_file_size,
+            'file_size_unit': file_size_unit
+        }
+        
+        # Сохраняем настройки
+        save_settings(settings)
+        
+        # Обновляем конфигурацию приложения
+        app.config['MAX_CONTENT_LENGTH'] = size_in_bytes
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True) 
