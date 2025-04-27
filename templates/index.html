@@ -6,6 +6,7 @@
     <title>FileChanger</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --primary-color: #4F46E5;
@@ -325,7 +326,7 @@
         }
 
         .connection-info {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
             padding: 1.5rem;
             border-radius: 1rem;
@@ -334,16 +335,224 @@
 
         .connection-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr auto auto;
             gap: 1.5rem;
             align-items: center;
+        }
+
+        .connection-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
 
         .qr-wrapper {
             background-color: white;
             padding: 1rem;
             border-radius: 0.5rem;
-            width: fit-content;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 160px;
+            height: 160px;
+        }
+
+        .qr-wrapper img {
+            width: 128px;
+            height: 128px;
+            display: block;
+        }
+
+        .connection-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .connection-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .connection-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .connection-button i {
+            font-size: 1.1rem;
+        }
+
+        .ip-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .masked-ip {
+            font-family: monospace;
+        }
+        
+        .ip-toggle {
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .ip-toggle:hover {
+            opacity: 1;
+        }
+        
+        .ip-toggle i {
+            font-size: 1.2em;
+        }
+
+        /* Обновленные стили для таблицы устройств */
+        .devices-table {
+            width: 100%;
+            border-radius: 0.5rem;
+            background-color: var(--card-bg);
+        }
+        
+        .devices-table table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+        }
+        
+        .devices-table th,
+        .devices-table td {
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .devices-table th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            background-color: var(--bg-color);
+        }
+
+        .devices-table td.device-type {
+            width: 20%;
+        }
+
+        .devices-table td.device-type i {
+            margin-right: 0.5rem;
+        }
+
+        .devices-table td.device-type span {
+            display: inline-block;
+            vertical-align: middle;
+            max-width: calc(100% - 2rem);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .devices-table td.last-seen {
+            width: 25%;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .devices-table td.user-name {
+            width: 30%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .devices-table td.ip-cell {
+            width: 25%;
+        }
+
+        .devices-table td.ip-cell .ip-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            max-width: 100%;
+        }
+
+        .devices-table td.ip-cell .masked-ip {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .devices-table td.ip-cell .ip-toggle {
+            flex-shrink: 0;
+        }
+        
+        .devices-table tbody tr {
+            transition: background-color 0.2s;
+        }
+        
+        .devices-table tbody tr:hover {
+            background-color: var(--bg-color);
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .devices-table td.device-type {
+                width: 25%;
+            }
+
+            .devices-table td.last-seen {
+                width: 20%;
+            }
+
+            .devices-table td.user-name {
+                width: 30%;
+            }
+
+            .devices-table td.ip-cell {
+                width: 25%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .devices-table th,
+            .devices-table td {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Обновленная структура таблицы */
+        .devices-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
         }
 
         @media (max-width: 768px) {
@@ -893,6 +1102,146 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px var(--primary-light);
         }
+
+        /* Обновленные стили для стрелочки и строки */
+        .devices-table tr.expandable {
+            cursor: pointer;
+        }
+
+        .devices-table .expand-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            padding: 0;
+        }
+
+        .devices-table .expand-button i {
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .devices-table tr.expanded .expand-button i {
+            transform: rotate(90deg);
+        }
+
+        .details-row {
+            display: none;
+            background-color: var(--bg-color);
+        }
+
+        .details-row.visible {
+            display: table-row;
+        }
+
+        /* Стили для бургер-меню */
+        .burger-menu {
+            position: relative;
+            margin-left: auto;
+        }
+
+        .burger-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .burger-button:hover {
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .burger-button.active {
+            color: var(--primary-color);
+        }
+
+        .burger-menu-content {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .burger-menu-content.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .menu-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .menu-item:hover {
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+        }
+
+        .menu-item i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 8px 0;
+        }
+
+        /* Оверлей для закрытия меню при клике вне */
+        .burger-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            display: none;
+            z-index: 1000;
+        }
+
+        .burger-overlay.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -904,18 +1253,29 @@
             </div>
             <div class="header-actions">
                 <span class="username">{{ username }}</span>
-                {% if is_owner %}
-                <button class="settings-button" onclick="toggleSidebar()">
-                    <i class="fas fa-cog"></i>
-                </button>
-                {% endif %}
-                <button class="theme-toggle" id="themeToggle">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <a href="{{ url_for('logout') }}" class="logout-button">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Выйти
-                </a>
+                <div class="burger-menu">
+                    <button class="burger-button" onclick="toggleBurgerMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="burger-menu-content">
+                        <button class="menu-item" onclick="toggleTheme()">
+                            <i class="fas fa-moon"></i>
+                            Сменить тему
+                        </button>
+                        {% if is_owner %}
+                        <div class="menu-divider"></div>
+                        <button class="menu-item" onclick="toggleSidebar()">
+                            <i class="fas fa-cog"></i>
+                            Настройки
+                        </button>
+                        {% endif %}
+                        <div class="menu-divider"></div>
+                        <a href="{{ url_for('logout') }}" class="menu-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Выйти
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         </header>
@@ -1005,17 +1365,32 @@
     <div class="container">
         <div class="connection-info">
             <div class="connection-grid">
-            <div>
-                    <h2 style="margin-bottom: 0.5rem">Подключение</h2>
-                    <p>IP адрес: {{ local_ip }}:5000</p>
+                <div class="connection-details">
+                    <h3>Информация о подключении</h3>
+                    <div class="ip-container">
+                        <span>Локальный IP: </span>
+                        <span class="masked-ip" data-ip="{{ local_ip }}">•••.•••.•••.•••</span>
+                        <span class="ip-toggle" onclick="toggleIP(this)" title="Показать/скрыть IP">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
                 </div>
-                <div class="qr-wrapper">
-                    <div id="qrcode"></div>
+                <div class="qr-section">
+                    <div class="qr-wrapper">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=http://{{ local_ip }}:5000" alt="QR Code">
+                    </div>
+                    <span class="qr-label">Сканируйте для подключения</span>
                 </div>
-                <button class="button button-secondary" onclick="copyToClipboard('http://{{ local_ip }}:5000')">
-                    <i class="fas fa-copy"></i>
-                    Копировать ссылку
-                </button>
+                <div class="connection-actions">
+                    <button class="connection-button" onclick="copyToClipboard('http://{{ local_ip }}:5000')">
+                        <i class="fas fa-copy"></i>
+                        Копировать ссылку
+                    </button>
+                    <button class="connection-button" onclick="window.location.reload()">
+                        <i class="fas fa-sync-alt"></i>
+                        Обновить
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1130,34 +1505,73 @@
                     </h2>
                     </div>
                 <div class="card-body">
-                    <div class="connected-devices" id="connectedDevices">
-                        {% for ip, device in connected_devices.items() %}
-                        <div class="device-item">
-                            <i class="fas {% if device.device_type == 'Мобильное устройство' %}fa-mobile-alt{% else %}fa-laptop{% endif %} device-icon"></i>
-                            <div class="device-info">
-                                <div class="device-name">
-                                    <span class="device-type">{{ device.device_type }}</span>
-                                    {% if device.formatted_name %}
-                                    <span class="device-username">{{ device.formatted_name }}</span>
-                                    {% endif %}
-                                </div>
-                                <div class="device-details" style="display: none;" id="details-{{ ip }}">
-                                    <p><strong>IP:</strong> {{ ip }}</p>
-                                    <p><strong>Устройство:</strong> {{ device.device_type }}</p>
-                                    <p><strong>Последняя активность:</strong> {{ device.last_seen }}</p>
-                                    {% if is_owner %}
-                                    <p><strong>User Agent:</strong> {{ device.user_agent }}</p>
-                                    {% endif %}
-                                </div>
-                                <div class="device-actions">
-                                    <button class="action-button" onclick="toggleDetails('{{ ip }}')">
-                                        <i class="fas fa-info-circle"></i>
-                                        Подробнее
-                                    </button>
-                                </div>
-                            </div>
+                    <div class="devices-section">
+                        <h3>Подключенные устройства</h3>
+                        <div class="devices-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Пользователь</th>
+                                        <th>IP</th>
+                                        <th>Устройство</th>
+                                        <th>Активность</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ip, device in connected_devices.items() %}
+                                    <tr class="expandable" data-ip="{{ ip }}">
+                                        <td class="user-name">
+                                            <button type="button" class="expand-button" onclick="toggleDetails('{{ ip }}')">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                            {{ device.formatted_name if device.formatted_name else 'Неизвестно' }}
+                                        </td>
+                                        <td class="ip-cell">
+                                            <div class="ip-container">
+                                                <span class="masked-ip" data-ip="{{ ip }}">•••.•••.•••.•••</span>
+                                                <span class="ip-toggle" onclick="toggleIP(this)" title="Показать/скрыть IP">
+                                                    <i class="fas fa-eye"></i>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="device-type">
+                                            <i class="fas {% if device.device_type == 'Мобильное устройство' %}fa-mobile-alt{% else %}fa-laptop{% endif %}"></i>
+                                            <span>{{ device.device_type }}</span>
+                                        </td>
+                                        <td class="last-seen">{{ device.last_seen }}</td>
+                                    </tr>
+                                    <tr class="details-row" data-ip="{{ ip }}">
+                                        <td colspan="4">
+                                            <div class="details-content">
+                                                <div class="detail-group">
+                                                    <span class="detail-label">Полное имя</span>
+                                                    <span class="detail-value">{{ device.formatted_name if device.formatted_name else 'Неизвестно' }}</span>
+                                                </div>
+                                                <div class="detail-group">
+                                                    <span class="detail-label">IP адрес</span>
+                                                    <span class="detail-value">{{ ip }}</span>
+                                                </div>
+                                                <div class="detail-group">
+                                                    <span class="detail-label">Тип устройства</span>
+                                                    <span class="detail-value">{{ device.device_type }}</span>
+                                                </div>
+                                                <div class="detail-group">
+                                                    <span class="detail-label">Последняя активность</span>
+                                                    <span class="detail-value">{{ device.last_seen }}</span>
+                                                </div>
+                                                {% if is_owner %}
+                                                <div class="detail-group user-agent-info">
+                                                    <span class="detail-label">User Agent</span>
+                                                    <span class="detail-value">{{ device.user_agent }}</span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                {% endfor %}
                     </div>
                 </div>
             </div>
@@ -1169,7 +1583,8 @@
         <span id="notificationText"></span>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <div class="burger-overlay" onclick="toggleBurgerMenu()"></div>
+
     <script>
         // Theme toggling
         const themeToggle = document.getElementById('themeToggle');
@@ -1228,13 +1643,6 @@
             if (fileInput.files.length > 0) {
                 uploadForm.submit();
             }
-        });
-
-        // QR Code generation
-        new QRCode(document.getElementById("qrcode"), {
-            text: 'http://{{ local_ip }}:5000',
-            width: 128,
-            height: 128
         });
 
         // Clipboard functionality
@@ -1373,13 +1781,22 @@
         }
 
         function toggleDetails(ip) {
-            const details = document.getElementById(`details-${ip}`);
-            if (details) {
-                if (details.style.display === 'none') {
-                    details.style.display = 'block';
-                } else {
-                    details.style.display = 'none';
-                }
+            // Находим основную строку и строку с деталями
+            const mainRow = document.querySelector(`.expandable[data-ip="${ip}"]`);
+            const detailsRow = document.querySelector(`.details-row[data-ip="${ip}"]`);
+            
+            // Переключаем классы для анимации
+            mainRow.classList.toggle('expanded');
+            detailsRow.classList.toggle('visible');
+            
+            // Анимируем появление контента
+            const content = detailsRow.querySelector('.details-content');
+            if (detailsRow.classList.contains('visible')) {
+                content.style.opacity = '0';
+                requestAnimationFrame(() => {
+                    content.style.transition = 'opacity 0.3s ease';
+                    content.style.opacity = '1';
+                });
             }
         }
 
@@ -1483,6 +1900,38 @@
                 input.type = 'password';
                 button.innerHTML = '<i class="fas fa-eye"></i>';
             }
+        }
+
+        function toggleIP(element) {
+            const container = element.closest('.ip-container');
+            const maskedElement = container.querySelector('.masked-ip');
+            const icon = container.querySelector('i');
+            
+            if (maskedElement.textContent === '•••.•••.•••.•••') {
+                maskedElement.textContent = maskedElement.dataset.ip;
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                maskedElement.textContent = '•••.•••.•••.•••';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function toggleBurgerMenu() {
+            const button = document.querySelector('.burger-button');
+            const menu = document.querySelector('.burger-menu-content');
+            const overlay = document.querySelector('.burger-overlay');
+            
+            button.classList.toggle('active');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            setTheme(!isDark);
+            toggleBurgerMenu(); // Закрываем меню после переключения темы
         }
     </script>
 </body>

@@ -221,18 +221,20 @@ def index():
     files_info = {}
     for file in files:
         owner_info = file_owners.get(file, {})
-        owner_id = owner_info.get('uploader')
+        uploader_id = owner_info.get('uploader')
         formatted_name = "Неизвестно"
         
-        # Ищем пользователя по ID
-        for username, user_data in users.items():
-            if owner_id and owner_id == session.get('user_id'):
-                formatted_name = format_name_with_initials(
-                    user_data.get('lastname', ''),
-                    user_data.get('firstname', ''),
-                    user_data.get('patronymic', '')
-                )
-                break
+        # Находим пользователя, который загрузил файл
+        if uploader_id:
+            for username, user_data in users.items():
+                # Сравниваем только IP адреса, так как они уникальны для каждого пользователя
+                if user_data.get('ip') and uploader_id.endswith(user_data['ip']):
+                    formatted_name = format_name_with_initials(
+                        user_data.get('lastname', ''),
+                        user_data.get('firstname', ''),
+                        user_data.get('patronymic', '')
+                    )
+                    break
         
         files_info[file] = {
             'name': file,
@@ -245,18 +247,20 @@ def index():
     links_info = {}
     for link in links:
         owner_info = link_owners.get(link, {})
-        owner_id = owner_info.get('uploader')
+        uploader_id = owner_info.get('uploader')
         formatted_name = "Неизвестно"
         
-        # Ищем пользователя по ID
-        for username, user_data in users.items():
-            if owner_id and owner_id == session.get('user_id'):
-                formatted_name = format_name_with_initials(
-                    user_data.get('lastname', ''),
-                    user_data.get('firstname', ''),
-                    user_data.get('patronymic', '')
-                )
-                break
+        # Находим пользователя, который добавил ссылку
+        if uploader_id:
+            for username, user_data in users.items():
+                # Сравниваем только IP адреса, так как они уникальны для каждого пользователя
+                if user_data.get('ip') and uploader_id.endswith(user_data['ip']):
+                    formatted_name = format_name_with_initials(
+                        user_data.get('lastname', ''),
+                        user_data.get('firstname', ''),
+                        user_data.get('patronymic', '')
+                    )
+                    break
         
         links_info[link] = {
             'url': link,
